@@ -49,3 +49,27 @@ def balance(transactions):
     income = sum(t["amount"] for t in transactions if t["type"] == INCOME)
     expense = sum(t["amount"] for t in transactions if t["type"] == EXPENSE)
     return income, expense, income - expense
+
+
+def current_month():
+    """Возвращает текущий месяц в формате ГГГГ-ММ."""
+    return date.today().strftime("%Y-%m")
+
+
+def filter_by_month(transactions, month):
+    """Оставляет операции выбранного месяца (формат ГГГГ-ММ)."""
+    return [t for t in transactions if t["date"].startswith(month)]
+
+
+def expenses_by_category(transactions):
+    """Группирует расходы по категориям и считает долю каждой категории в процентах."""
+    totals = {}
+    for t in transactions:
+        if t["type"] == EXPENSE:
+            totals[t["category"]] = totals.get(t["category"], 0) + t["amount"]
+    total = sum(totals.values())
+    report = []
+    for category, amount in sorted(totals.items(), key=lambda item: item[1], reverse=True):
+        share = amount / total * 100 if total else 0
+        report.append((category, amount, round(share, 1)))
+    return report
