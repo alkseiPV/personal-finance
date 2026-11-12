@@ -45,11 +45,29 @@ def show_balance():
     print(f"Баланс:  {rest:.2f} руб.")
 
 
+def show_report():
+    month = input("Месяц в формате ГГГГ-ММ (пустой ввод означает текущий месяц): ").strip()
+    if not month:
+        month = finance.current_month()
+    rows = finance.filter_by_month(finance.load_transactions(), month)
+    income, expense, rest = finance.balance(rows)
+    print(f"Отчет за {month}")
+    print(f"Доходы: {income:.2f} руб., расходы: {expense:.2f} руб., остаток: {rest:.2f} руб.")
+    report = finance.expenses_by_category(rows)
+    if not report:
+        print("Расходов за этот месяц нет")
+        return
+    print("Структура расходов:")
+    for category, amount, share in report:
+        print(f"  {category:<15} {amount:>10.2f} руб.  {share:5.1f} %")
+
+
 MENU = {
     "1": ("Добавить доход", lambda: add_operation(finance.INCOME)),
     "2": ("Добавить расход", lambda: add_operation(finance.EXPENSE)),
     "3": ("Показать все операции", show_operations),
     "4": ("Показать баланс", show_balance),
+    "5": ("Отчет по категориям расходов за месяц", show_report),
 }
 
 
